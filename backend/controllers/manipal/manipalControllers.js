@@ -1,10 +1,10 @@
-const {ajantaFinalData, ajantaInsightsData} = require('../../model/ajanta/ajantaModel')
+const {manipalFinalData, manipalInsightsData} = require('../../model/manipal/manipalModel')
 
 async function getAllData(req, res)
 {
-    const reviewRating = await ajantaFinalData.aggregate([{$group: {_id: null, totalreviews: {$sum: "$totalReviewCount"}, averagerating: {$sum: "$averageRating"}}}]);
-    const analysis = await ajantaInsightsData.aggregate([{$group: {_id: null, "Google Search Mobile": {$sum: "$Google Search - Mobile"}, "Google Search Desktop": {$sum: "$Google Search - Desktop"}, "Google Maps Mobile": {$sum: "$Google Maps - Mobile"}, "Google Maps Desktop": {$sum: "$Google Maps - Desktop"}, "Calls": {$sum: "$Calls"}, "Directions": {$sum: "$Directions"}, "Websit Clicks": {$sum: "$Website clicks"}}}]);
-    const graphDataCalls = await ajantaInsightsData.aggregate([
+    const reviewRating = await manipalFinalData.aggregate([{$group: {_id: null, totalreviews: {$sum: "$totalReviewCount"}, averagerating: {$sum: "$averageRating"}}}]);
+    const analysis = await manipalInsightsData.aggregate([{$group: {_id: null, "Google Search Mobile": {$sum: "$Google Search – Mobile"}, "Google Search Desktop": {$sum: "$Google Search – Desktop"}, "Google Maps Mobile": {$sum: "$Google Maps – Mobile"}, "Google Maps Desktop": {$sum: "$Google Maps – Desktop"}, "Calls": {$sum: "$Calls"}, "Directions": {$sum: "$Directions"}, "Websit Clicks": {$sum: "$Website clicks"}}}]);
+    const graphDataCalls = await manipalInsightsData.aggregate([
     {
       $group: {
         _id: "$Month", 
@@ -28,11 +28,11 @@ async function getAllData(req, res)
       }
     }
   ])
-    const graphDataSearchesMobils = await ajantaInsightsData.aggregate([
+    const graphDataSearchesMobils = await manipalInsightsData.aggregate([
     {
       $group: {
         _id: "$Month",
-        totalGoogleSearchMobile: { $sum: "$Google Search - Mobile" }
+        totalGoogleSearchMobile: { $sum: "$Google Search – Mobile" }
       }
     },
     {
@@ -52,11 +52,11 @@ async function getAllData(req, res)
       }
     }
   ])
-    const graphDataSearchesDesktops = await ajantaInsightsData.aggregate([
+    const graphDataSearchesDesktops = await manipalInsightsData.aggregate([
     {
       $group: {
         _id: "$Month",
-        totalGoogleSearchDesktop: { $sum: "$Google Search - Desktop" }
+        totalGoogleSearchDesktop: { $sum: "$Google Search – Desktop" }
       }
     },
     {
@@ -88,7 +88,7 @@ async function getAllData(req, res)
 
 async function getTopFiveDoctors(req, res)
 {
-  const getTopFivedocs = await ajantaInsightsData.aggregate([
+  const getTopFivedocs = await manipalInsightsData.aggregate([
       {
         $group: {
           _id: "$Business name",
@@ -107,12 +107,12 @@ async function getTopFiveDoctors(req, res)
 
 async function getAllDoctorNames(req, res)
 {
-  const allDoctors = await ajantaInsightsData.aggregate([
+  const allDoctors = await manipalInsightsData.aggregate([
     {
       $lookup: {
-        from: 'ajantafinaldatas',
-        localField: 'Business name', // Field from ajantainsightsdatas
-        foreignField: 'business_name', // Field from ajantafinaldatas
+        from: 'manipalfinaldatas',
+        localField: 'Business name', // Field from manipalInsightsDatas
+        foreignField: 'business_name', // Field from manipalFinalDatas
         as: 'matchedBusinesses'
       }
     },
@@ -150,9 +150,7 @@ async function getDocData(req, res)
   const basicDetails = []
   let review_count = 0
   let rating_count = 0
-  let bc = 0
-  let gc = 0
-  const docData = await ajantaInsightsData.aggregate([
+  const docData = await manipalInsightsData.aggregate([
     {
       $match: {
         "Business name": requestData
@@ -161,10 +159,10 @@ async function getDocData(req, res)
     {
       $group: {
         _id: "$Month",
-        "Google Search - Mobile": { $push: "$Google Search - Mobile" },
-        "Google Search - Desktop": { $push: "$Google Search - Desktop" },
-        "Google Maps - Mobile": { $push: "$Google Maps - Mobile" },
-        "Google Maps - Desktop": { $push: "$Google Maps - Desktop" },
+        "Google Search – Mobile": { $push: "$Google Search – Mobile" },
+        "Google Search – Desktop": { $push: "$Google Search – Desktop" },
+        "Google Maps – Mobile": { $push: "$Google Maps – Mobile" },
+        "Google Maps – Desktop": { $push: "$Google Maps – Desktop" },
         "Website clicks": { $push: "$Website clicks" },
         "Directions": { $push: "$Directions" },
         "Calls": { $push: "$Calls" }
@@ -177,7 +175,7 @@ async function getDocData(req, res)
             [
               {
                 k: "$_id",
-                v: { $concatArrays: ["$Google Search - Mobile", "$Google Search - Desktop", "$Google Maps - Mobile", "$Google Maps - Desktop", "$Website clicks", "$Directions", "$Calls"] }
+                v: { $concatArrays: ["$Google Search – Mobile", "$Google Search – Desktop", "$Google Maps – Mobile", "$Google Maps – Desktop", "$Website clicks", "$Directions", "$Calls"] }
               }
             ]
           ]
@@ -186,7 +184,7 @@ async function getDocData(req, res)
     }
   ])
 
-  const labels = await ajantaFinalData.aggregate([
+  const labels = await manipalFinalData.aggregate([
     {
       $match: {
         "business_name": requestData
@@ -201,7 +199,7 @@ async function getDocData(req, res)
       },
   ] )
   
-  const mapsGraph = await ajantaInsightsData.aggregate([
+  const mapsGraph = await manipalInsightsData.aggregate([
   {
       $match: { "Business name": requestData } // Specify the business name here
   },
@@ -210,7 +208,7 @@ async function getDocData(req, res)
         _id: "$Month",
         totalSearches: {
           $sum: {
-            $add: ["$Google Maps - Desktop", "$Google Maps - Mobile"]
+            $add: ["$Google Maps – Desktop", "$Google Maps – Mobile"]
           }
         }
       }
@@ -232,7 +230,7 @@ async function getDocData(req, res)
       }
     }
   ])
-  const actionGraph = await ajantaInsightsData.aggregate([
+  const actionGraph = await manipalInsightsData.aggregate([
   {
       $match: { "Business name": requestData } // Specify the business name here
   },
@@ -263,7 +261,7 @@ async function getDocData(req, res)
       }
     }
   ])
-  const searchesGraph = await ajantaInsightsData.aggregate([
+  const searchesGraph = await manipalInsightsData.aggregate([
   {
     $match: { "Business name": requestData } // Specify the business name here
   },
@@ -272,7 +270,7 @@ async function getDocData(req, res)
       _id: "$Month",
       totalSearches: {
         $sum: {
-          $add: ["$Google Search - Desktop", "$Google Search - Mobile"]
+          $add: ["$Google Search – Desktop", "$Google Search – Mobile"]
         }
       }
     }
@@ -309,12 +307,12 @@ async function getDocData(req, res)
   if(labels.length != 0)
   {
     // return res.json(labels)
-    // console.log(labels.length)
+    console.log(labels[0].Labels[0][0])
     const competitor = labels[0].Labels[0][0].competitors
     images = {
-      lable1: "https://staging.multipliersolutions.com/gmbnewprofiles/Ajanta/lables/" + labels[ 0 ].Labels[ 0 ][ 0 ].screen_shot + ".png",
-      lable2: "https://staging.multipliersolutions.com/gmbnewprofiles/Ajanta/lables/" + labels[ 0 ].Labels[ 0 ][ 1 ].screen_shot + ".png",
-      profile: "https://staging.multipliersolutions.com/gmbnewprofiles/Ajanta/profiles/" + labels[ 0 ].ss
+      lable1: "https://staging.multipliersolutions.com/gmbnewprofiles/Manipal/" + labels[ 0 ].Labels[ 0 ][ 0 ].screen_shot + ".png",
+      lable2: "https://staging.multipliersolutions.com/gmbnewprofiles/Manipal/" + labels[ 0 ].Labels[ 0 ][ 1 ].screen_shot + ".png",
+      profile: "https://staging.multipliersolutions.com/gmbnewprofiles/Manipal/" + labels[ 0 ].ss
     }
 
     labels[0].Labels[0].map((item, i) => {
@@ -335,126 +333,100 @@ async function getDocData(req, res)
       }
     } )
   }
-  const accountID = await ajantaFinalData.aggregate([
+  const accountID = await manipalFinalData.aggregate([
     { $match: { business_name: requestData } },
-    { $project: { _id: 0, account: 1 } },
-    { $group: { _id: null, accounts: { $push: "$account" } } },
-    { $project: { _id: 0, accounts: 1 } }
+    { $project: { _id: 0, account: 1, mail_id: 1 } },
+    { $group: { _id: null, accounts: { $push: "$account" }, mail_id: {$push: "$mail_id"} } },
+    { $project: { _id: 0, accounts: 1, mail_id: 1 } }
   ] )
   // return res.json(requestData, accountID)
   ratings[0] = 0
   ratings[1] = 0
   ratings[2] = 0
   ratings[3] = 0
-  ratings[ 4 ] = 0
-  const fullReview = {}
-  fullReview['FIVE'] = []
-  fullReview['FOUR'] = []
-  fullReview['THREE'] = []
-  fullReview['TWO'] = []
-  fullReview['ONE'] = []
+  ratings[4] = 0
   if ( accountID.length != 0 )
   {
     const account = accountID[ 0 ].accounts[ 0 ]
-    console.log( account )
+    const mail_id = accountID[ 0 ].mail_id[ 0 ]
+    console.log(mail_id)
+    console.log(account)
     async function rrHandeler(token)
     {
       const fetch = (await import('node-fetch')).default;
 
       const response = await fetch("https://multipliersolutions.in/gmbhospitals/gmb_api/api.php", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
             "function": "reviews",
-            "email": "ajantagmbaccess@gmail.com",
+            "email": mail_id,
             "location": account,
             "pageToken": token
-          })
+        })
       });
 
-      const responseText = await response.text();
+      const responseText = await response.text(); 
       const review = JSON.parse( responseText )
+      console.log(review)
       if ( review.totalReviewCount != null )
       {
         review_count = review.totalReviewCount
         rating_count = review.averageRating
         for(let i = 0; i < review.reviews.length; i++)    
         {
-          let counter = {}
-          counter['rating'] = review.reviews[i].starRating
-          counter['loc'] = review.reviews[i].name
-          counter['comment'] = review.reviews[i].comment
-          counter['rname'] = review.reviews[i].reviewer.displayName
-          counter['rprofilePhotoUrl'] = review.reviews[i].reviewer.profilePhotoUrl
-          counter['reply'] = {}
-          if(review.reviews[i].reviewReply)
+          if(review.reviews[i].comment !== null)
           {
-              counter['reply'] = review.reviews[i].reviewReply;
-          }
-
-          if(review.reviews[i].comment !== "null" && review.reviews[i].comment != null)
-          {
+            console.log(review.reviews[i].comment)
             if(goodreviews.length !== 5 && review.reviews[i].starRating === "FIVE")
-            {  
-              goodreviews.push( [gc + 1, review.reviews[ i ].comment ] )
-              gc++
+            {
+              goodreviews.push([goodreviews.length + 1, review.reviews[i].comment])
             }
             if(badreviews.length !== 5 && review.reviews[i].starRating === "ONE")
             {
-              badreviews.push( [bc + 1, review.reviews[ i ].comment ] )
-              bc++
+              badreviews.push([badreviews.length + 1, review.reviews[i].comment])
             }
           }
-          // console.log(review.reviews[i].starRating)
           if(review.reviews[i].starRating === "ONE")
           {
               ratings[0] += 1
-              fullReview['ONE'].push(counter)
           }
           if(review.reviews[i].starRating === "TWO")
           {
               ratings[1] += 1
-              fullReview['TWO'].push(counter)
           }
           if(review.reviews[i].starRating === "THREE")
           {
               ratings[2] += 1
-              fullReview['THREE'].push(counter)
           }
           if(review.reviews[i].starRating === "FOUR")
           {
-            // console.log("===========================",review.reviews[i].starRating)
-            fullReview['FOUR'].push(counter)
-            ratings[3] += 1
+              ratings[3] += 1
           }
           if(review.reviews[i].starRating === "FIVE")
           {
-              fullReview['FIVE'].push(counter)
               ratings[4] += 1
           }
-          counter++
+        }
+        if(review.nextPageToken)
+        {
+            rrHandeler(review.nextPageToken)
         }
       }
-      // console.log(review.nextPageToken)
-      if(review.nextPageToken)
-      {
-        await rrHandeler(review.nextPageToken)
-      }
     }
-
     await rrHandeler("")
   }
-  const finalDetails = await ajantaFinalData.find( { business_name: requestData }, { _id: 0, name: 1, phone: 1 } )
-
+  const finalDetails = await manipalFinalData.find( { business_name: requestData }, { _id: 0, name: 1, phone: 1, averageRating: 1, totalReviewCount: 1 } )
+  
   let rr_details = {
     "averageRating": rating_count,
     "totalReviewCount": review_count
   }
   basicDetails.push( rr_details )
-  
-  return res.status(200).json({result, cRank, keywordsRanking, searchesGraph, mapsGraph, images, actionGraph, ratings, goodreviews, badreviews, basicDetails, fullReview, finalDetails})
+
+  return res.status(200).json({result, cRank, keywordsRanking, searchesGraph, mapsGraph, images, actionGraph, ratings, goodreviews, badreviews, basicDetails, finalDetails})
   
 }
 
