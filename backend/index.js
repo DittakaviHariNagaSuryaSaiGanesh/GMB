@@ -10,7 +10,8 @@ const crosOPT = {
     origin: "localhost:3000",
     originSuccessStatus: 200
 }
-app.use(express.json())
+app.use( express.json() )
+app.use(cros(crosOPT))
 
 app.use((req, res, next) => {
     next();
