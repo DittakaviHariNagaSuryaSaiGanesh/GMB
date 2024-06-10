@@ -7,7 +7,7 @@ const ajantaApis = require('./routes/ajanta/userRouts');
 const userApi = require( './routes/login/loginRout' );
 const manipalApis = require( './routes/manipal/manipalRout' )
 const crosOPT = {
-    origin: "localhost:3000",
+    origin: "http://localhost:3000/",
     originSuccessStatus: 200
 }
 app.use( express.json() )
