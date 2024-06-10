@@ -7,7 +7,7 @@ const ajantaApis = require('./routes/ajanta/userRouts');
 const userApi = require( './routes/login/loginRout' );
 const manipalApis = require( './routes/manipal/manipalRout' )
 const crosOPT = {
-    origin: "http://localhost:3000/",
+    origin: "https://staging.multipliersolutions.com/GMB/",
     originSuccessStatus: 200
 }
 app.use( express.json() )
